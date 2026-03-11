@@ -15,17 +15,21 @@ import { env } from './config/env.js';
 
 const app = express();
 
+/* ---------------- ERROR HANDLING ---------------- */
+
 process.on('unhandledRejection', (reason) => {
-  // eslint-disable-next-line no-console
   console.error('Unhandled promise rejection', reason);
 });
 
 process.on('uncaughtException', (err) => {
-  // eslint-disable-next-line no-console
   console.error('Uncaught exception', err);
 });
 
+/* ---------------- SECURITY ---------------- */
+
 app.use(helmet());
+
+/* ---------------- CORS ---------------- */
 
 const corsOptions: cors.CorsOptions = {
   origin: (origin, cb) => {
@@ -38,6 +42,7 @@ const corsOptions: cors.CorsOptions = {
     }
 
     const allowed = env.corsOrigin;
+
     if (allowed.includes(origin)) {
       return cb(null, true);
     }
@@ -47,10 +52,10 @@ const corsOptions: cors.CorsOptions = {
   credentials: true,
 };
 
-app.use(
-  cors(corsOptions),
-);
+app.use(cors(corsOptions));
 app.use(express.json({ limit: '1mb' }));
+
+/* ---------------- RATE LIMIT ---------------- */
 
 const apiLimiter = rateLimit({
   windowMs: 60_000,
@@ -58,25 +63,41 @@ const apiLimiter = rateLimit({
   standardHeaders: 'draft-7',
   legacyHeaders: false,
   handler: (_req, res) => {
-    res.status(429).json({ success: false, message: 'Too many requests, please try again later.' });
+    res.status(429).json({
+      success: false,
+      message: 'Too many requests, please try again later.',
+    });
   },
+});
+
+/* ---------------- HEALTH ROUTES ---------------- */
+
+app.get('/', (_req, res) => {
+  res.send('WaitWise API running 🚀');
 });
 
 app.get('/health', (_req, res) => {
   res.json({ ok: true });
 });
 
+/* ---------------- API ROUTES ---------------- */
+
 if (process.env.NODE_ENV === 'production') {
   app.use('/api', apiLimiter);
 }
+
 app.use('/api', apiRouter);
+
+/* ---------------- ERROR MIDDLEWARE ---------------- */
+
 app.use(notFoundHandler);
 app.use(errorHandler);
+
+/* ---------------- SERVER + SOCKET ---------------- */
 
 const server = http.createServer(app);
 
 server.on('error', (err) => {
-  // eslint-disable-next-line no-console
   console.error('HTTP server error', err);
 });
 
@@ -92,16 +113,17 @@ const io = new SocketIOServer(server, {
     credentials: true,
   },
 });
+
 attachIo(io);
+
+/* ---------------- DATABASE + START SERVER ---------------- */
 
 async function start() {
   mongoose.connection.on('error', (err) => {
-    // eslint-disable-next-line no-console
     console.error('MongoDB connection error', err);
   });
 
   mongoose.connection.on('connected', () => {
-    // eslint-disable-next-line no-console
     console.log('MongoDB connected', {
       host: mongoose.connection.host,
       name: mongoose.connection.name,
@@ -109,20 +131,21 @@ async function start() {
   });
 
   mongoose.connection.on('disconnected', () => {
-    // eslint-disable-next-line no-console
     console.error('MongoDB disconnected');
   });
 
   await mongoose.connect(env.mongoUri);
 
-  server.listen(env.port, () => {
-    // eslint-disable-next-line no-console
-    console.log(`Backend listening on http://localhost:${env.port}`);
+  const PORT = process.env.PORT || env.port;
+
+  server.listen(PORT, () => {
+    console.log(`Backend listening on ${PORT}`);
   });
 }
 
 start().catch((err) => {
-  // eslint-disable-next-line no-console
   console.error('Failed to start server', err);
   process.exit(1);
 });
+
+export default app;
