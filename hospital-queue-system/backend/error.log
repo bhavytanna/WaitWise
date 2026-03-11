@@ -1,0 +1,59 @@
+﻿node.exe : 
+node:events:502
+At C:\Program Files\no
+dejs\npx.ps1:29 char:3
++   & $NODE_EXE 
+$NPX_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~
+    + CategoryInfo    
+          : NotSpeci  
+  fied: (node:event   
+ s:502:String) [],    
+ RemoteException
+    + FullyQualifiedE 
+   rrorId : NativeCo  
+  mmandError
+ 
+      throw er; // 
+Unhandled 'error' 
+event
+      ^
+
+Error: listen 
+EADDRINUSE: address 
+already in use :::4000
+    at Server.setupLis
+tenHandle [as 
+_listen2] 
+(node:net:1912:16)
+    at 
+listenInCluster 
+(node:net:1969:12)
+    at Server.listen 
+(node:net:2074:7)
+    at start 
+(D:\hospital managemen
+t\hospital-queue-syste
+m\backend\src\server.t
+s:85:10)
+    at process.process
+TicksAndRejections (no
+de:internal/process/ta
+sk_queues:105:5)
+Emitted 'error' event 
+on Server instance at:
+    at emitErrorNT 
+(node:net:1948:8)
+    at process.process
+TicksAndRejections (no
+de:internal/process/ta
+sk_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v22.12.0
