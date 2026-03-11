@@ -5,7 +5,7 @@ export type ApiError = {
 };
 
 const rawBase = (import.meta as any).env?.VITE_API_URL;
-const API_BASE = typeof rawBase === 'string' && rawBase.trim() ? rawBase.trim() : 'http://127.0.0.1:4000';
+const API_BASE = typeof rawBase === 'string' && rawBase.trim() ? rawBase.trim() : 'https://waitwise-vdyd.onrender.com';
 
 export async function apiRequest<T>(
   path: string,
