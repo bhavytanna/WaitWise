@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Alert, Button, Card, Container, Input, Label } from '../components/ui';
+import { Alert, Button, Container, Input, Label } from '../components/ui';
 import { login } from '../services/hospitalApi';
 import { setAuth } from '../services/authStore';
 import { motion } from 'framer-motion';
-import { LockKeyhole, ShieldAlert, UserRound } from 'lucide-react';
+import { ShieldAlert, ArrowRight } from 'lucide-react';
 
 export default function AdminLoginPage() {
   const navigate = useNavigate();
@@ -33,57 +33,91 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-      <Container className="pt-10">
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -left-24 -top-24 h-80 w-80 rounded-full bg-rose-200/60 blur-3xl dark:bg-rose-500/10" />
-          <div className="absolute -right-24 -top-20 h-80 w-80 rounded-full bg-violet-200/70 blur-3xl dark:bg-violet-500/10" />
-          <div className="absolute -bottom-28 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-amber-200/50 blur-3xl dark:bg-amber-500/10" />
-        </div>
+    <div className="relative min-h-[calc(100vh-65px)] flex items-center bg-slate-50 dark:bg-[#080c14] overflow-hidden">
+      {/* Background blobs */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -left-40 top-0 h-[450px] w-[450px] rounded-full bg-rose-300/20 blur-[90px] dark:bg-rose-700/12" />
+        <div className="absolute -right-32 top-20 h-[350px] w-[350px] rounded-full bg-violet-300/20 blur-[80px] dark:bg-violet-700/10" />
+        <div className="absolute bottom-0 left-1/3 h-[300px] w-[400px] rounded-full bg-amber-300/15 blur-[80px] dark:bg-amber-700/08" />
+      </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25 }}
-          className="relative mx-auto max-w-md"
-        >
-          <Card className="overflow-hidden">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700 shadow-sm dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200">
-                  <ShieldAlert size={14} className="text-rose-500" />
-                  Admin Portal
-                </div>
-                <h2 className="mt-3 text-xl font-semibold text-slate-900 dark:text-slate-50">Admin Login</h2>
-                <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Sign in with your admin account.</p>
-              </div>
-              <div className="rounded-2xl border border-slate-200 bg-white p-2 dark:border-slate-800 dark:bg-slate-950">
-                <LockKeyhole size={18} className="text-slate-700 dark:text-slate-200" />
+      <Container className="py-10">
+        <div className="mx-auto max-w-md">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {/* Badge */}
+            <div className="mb-6 flex justify-center">
+              <div className="inline-flex items-center gap-2 rounded-full border border-rose-200/80 bg-rose-50/80 px-4 py-1.5 text-xs font-semibold text-rose-700 backdrop-blur-sm dark:border-rose-800/50 dark:bg-rose-950/40 dark:text-rose-300">
+                <ShieldAlert size={13} />
+                Admin Portal — Secure Access
               </div>
             </div>
 
-            <form onSubmit={onSubmit} className="mt-6 space-y-4">
-              {error ? <Alert title="Error" message={error} /> : null}
-              <div>
-                <Label>Username</Label>
-                <div className="relative">
-                  <UserRound size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <Input className="pl-9" value={username} onChange={(e) => setUsername(e.target.value)} />
+            {/* Card */}
+            <div className="relative overflow-hidden rounded-2xl border border-white/20 bg-white/80 shadow-xl shadow-rose-500/5 backdrop-blur-xl dark:border-white/[0.06] dark:bg-slate-900/60 dark:shadow-rose-900/20">
+              {/* Top gradient strip — inside relative parent */}
+              <div className="h-1 w-full bg-gradient-to-r from-rose-400 via-rose-500 to-pink-500" />
+
+              <div className="p-7">
+                {/* Header */}
+                <div className="flex items-center gap-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-rose-500 to-pink-600 shadow-lg shadow-rose-500/30">
+                    <ShieldAlert size={22} className="text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">Admin Login</h2>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">Sign in to access the control panel</p>
+                  </div>
                 </div>
+
+                {/* Form */}
+                <form onSubmit={onSubmit} className="mt-7 space-y-5">
+                  {error ? <Alert title="Authentication Failed" message={error} /> : null}
+
+                  <div>
+                    <Label>Username</Label>
+                    <Input
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      placeholder="admin"
+                      autoComplete="username"
+                    />
+                  </div>
+
+                  <div>
+                    <Label>Password</Label>
+                    <Input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      autoComplete="current-password"
+                    />
+                  </div>
+
+                  <Button type="submit" disabled={loading} className="mt-2 w-full">
+                    {loading ? (
+                      <span className="inline-flex items-center gap-2">
+                        <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeOpacity="0.2" />
+                          <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+                        </svg>
+                        Signing in…
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-2">
+                        Sign in to Dashboard <ArrowRight size={15} />
+                      </span>
+                    )}
+                  </Button>
+                </form>
               </div>
-              <div>
-                <Label>Password</Label>
-                <div className="relative">
-                  <LockKeyhole size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <Input className="pl-9" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                </div>
-              </div>
-              <Button type="submit" disabled={loading} className="w-full">
-                {loading ? 'Signing in…' : 'Sign in'}
-              </Button>
-            </form>
-          </Card>
-        </motion.div>
+            </div>
+          </motion.div>
+        </div>
       </Container>
     </div>
   );
