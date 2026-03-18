@@ -59,7 +59,7 @@ export type PatientStatusResponse = {
     phone: string;
     tokenNumber: string;
     priority: 'normal' | 'emergency';
-    status: 'waiting' | 'in_consultation' | 'done';
+    status: 'waiting' | 'called' | 'in_consultation' | 'done';
     arrivalTime: string;
   };
   doctor: {
