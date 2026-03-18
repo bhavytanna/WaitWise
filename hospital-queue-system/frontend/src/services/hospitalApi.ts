@@ -179,6 +179,23 @@ export function adminStats() {
   return apiRequest<AdminStats>('/api/admin/stats', { token: auth?.token });
 }
 
+export type WipeAllDataResult = {
+  doctorsDeleted: number;
+  patientsDeleted: number;
+  queueItemsDeleted: number;
+  countersDeleted: number;
+  doctorUsersDeleted: number;
+};
+
+export function wipeAllData(confirm: string) {
+  const auth = getAuth();
+  return apiRequest<WipeAllDataResult>('/api/admin/wipe', {
+    method: 'POST',
+    body: { confirm },
+    token: auth?.token,
+  });
+}
+
 export function addDoctor(body: {
   name: string;
   department: string;

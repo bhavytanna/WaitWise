@@ -25,6 +25,7 @@ import {
   deleteDoctor,
   listTriagePatients,
   updateConsultTime,
+  wipeAllData,
   type TriagePatientDto,
 } from '../services/hospitalApi';
 
@@ -40,6 +41,7 @@ export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [wipeConfirm, setWipeConfirm] = useState('');
   const [triageDoctorId, setTriageDoctorId] = useState('');
   const [triagePatients, setTriagePatients] = useState<TriagePatientDto[]>([]);
   const [triageLoading, setTriageLoading] = useState(false);
@@ -118,6 +120,23 @@ export default function AdminDashboardPage() {
     try { await updateConsultTime(id, avgConsultTime); await refresh(); }
     catch (e: any) { setError(e?.message ?? 'Failed to update consultation time'); }
     finally { setBusy(false); }
+  }
+
+  async function onWipeAllData() {
+    const ok = confirm('This will DELETE all doctors, patients, queue, counters, and doctor logins. Continue?');
+    if (!ok) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await wipeAllData(wipeConfirm);
+      setWipeConfirm('');
+      await refresh();
+      await refreshTriage();
+    } catch (e: any) {
+      setError(e?.message ?? 'Failed to wipe all data');
+    } finally {
+      setBusy(false);
+    }
   }
 
   const statItems = [
@@ -286,6 +305,37 @@ export default function AdminDashboardPage() {
                         </div>
                       </div>
                     ))}
+                  </div>
+                </div>
+              </Card>
+            </div>
+
+            <div className="mt-6">
+              <Card>
+                <SectionHeader title="Danger Zone" subtitle="Administrative destructive actions" icon={<ShieldAlert size={16} />} />
+                <div className="mt-4 grid gap-3">
+                  <div className="rounded-xl border border-rose-200/60 bg-rose-50/50 p-4 dark:border-rose-900/40 dark:bg-rose-950/15">
+                    <div className="text-sm font-semibold text-rose-700 dark:text-rose-300">Wipe All Data</div>
+                    <div className="mt-1 text-xs text-rose-600 dark:text-rose-400">
+                      Type <span className="font-mono font-bold">WIPE_ALL_DATA</span> to confirm. This removes doctors, patients, queue items and counters.
+                    </div>
+                    <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                      <div className="sm:col-span-2">
+                        <Input
+                          value={wipeConfirm}
+                          onChange={(e) => setWipeConfirm(e.target.value)}
+                          placeholder="WIPE_ALL_DATA"
+                        />
+                      </div>
+                      <Button
+                        variant="danger"
+                        disabled={busy || loading || wipeConfirm !== 'WIPE_ALL_DATA'}
+                        onClick={onWipeAllData}
+                        className="text-xs"
+                      >
+                        Wipe All Data
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </Card>
